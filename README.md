@@ -1,6 +1,10 @@
-# 🧠 llm.nvim
+# 🧠 localLLM.nvim
 
-Use LLM's in Neovim. Build editor integrated prompts and customize your LLM workflow. The plugin comes with some starter prompts, but you can also create your own prompt library to suit your needs. 
+Forked from [gsuuon/llm.nvim](https://github.com/gsuuon/llm.nvim).
+
+Added optional `OPENAI_API_BASE` env to allow using a local LLM or any OpenAI API compatible endpoint.
+
+Use LLM's in Neovim. Build editor integrated prompts and customize your LLM workflow. The plugin comes with some starter prompts, but you can also create your own prompt library to suit your needs.
 
 https://user-images.githubusercontent.com/6422188/233238173-a3dcea16-9948-4e7c-a419-eeec04cb7e99.mp4
 

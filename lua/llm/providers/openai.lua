@@ -99,7 +99,7 @@ function M.request_completion(handlers, params, options)
     headers.Authorization = options.authorization
   end
 
-  local url_ = options.url
+  local url_ = os.getenv('OPENAI_API_BASE', options.url)
   if url_ then
     -- ensure we have a trailing slash if url was provided by options
     if not url_:sub(-1) == '/' then
