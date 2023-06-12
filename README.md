@@ -35,14 +35,14 @@ For local vector store:
 
 ```lua
 require('packer').startup(function(use)
-  use 'gsuuon/llm.nvim'
+  use 'delwiv/localLLM.nvim'
 end)
 ```
 ### With [lazy.nvim](https://github.com/folke/lazy.nvim)
 
 ```lua
 require('lazy').setup({
-  'gsuuon/llm.nvim'
+  'delwiv/localLLM.nvim'
 })
 ```
 
@@ -195,6 +195,12 @@ require('llm.providers.openai').initialize({
 ```
 
 </details>
+
+#### Local LLM (OpenAI compatible API)
+Keep a dummy `OPENAI_API_KEY`, and add `OPENAI_API_BASE`
+```sh
+OPENAI_API_KEY=qsd OPENAI_API_BASE=http://localhost:7860/v1 nvim .
+```
 
 #### Google PaLM
 Set the `PALM_API_KEY` environment variable to your [api key](https://makersuite.google.com/app/apikey).
