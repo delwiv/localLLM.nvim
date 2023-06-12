@@ -4,6 +4,8 @@ Forked from [gsuuon/llm.nvim](https://github.com/gsuuon/llm.nvim).
 
 Added optional `OPENAI_API_BASE` env to allow using a local LLM or any OpenAI API compatible endpoint.
 
+Checkout [oobabooga/text-generation-webui](https://github.com/oobabooga/text-generation-webui) with `--listen --extensions openai` params to expose a local LLM as a OpenAI compatible API
+
 Use LLM's in Neovim. Build editor integrated prompts and customize your LLM workflow. The plugin comes with some starter prompts, but you can also create your own prompt library to suit your needs.
 
 https://user-images.githubusercontent.com/6422188/233238173-a3dcea16-9948-4e7c-a419-eeec04cb7e99.mp4
@@ -270,7 +272,7 @@ Providers implement a simple interface so it's easy to add your own. Just set yo
 ```lua
 require('llm').setup({
   prompts = {
-    ['prompt name'] = ...
+    ['prompt_name'] = ...
   }
 })
 ```
@@ -319,7 +321,7 @@ https://github.com/gsuuon/llm.nvim/assets/6422188/0e4b2b68-5873-42af-905c-3bd5a0
 https://user-images.githubusercontent.com/6422188/233807212-d1830514-fe3b-4d38-877e-f3ecbdb222aa.mp4
 
 ```lua
-  ['commit message'] = {
+  ['commit_message'] = {
     provider = openai,
     mode = llm.mode.INSERT,
     builder = function()
@@ -363,7 +365,7 @@ end
 local instruct_code = 'You are a highly competent programmer. Include only valid code in your response.'
 
 return {
-  ['to code'] = {
+  ['to_code'] = {
     provider = openai,
     builder = function(input)
       local text, directive = match_llm_directive(input)
@@ -421,7 +423,7 @@ local segment = require('llm.segment')
 
 require('llm').setup({
   prompts = {
-    ['to spanish'] =
+    ['to_spanish'] =
       {
         provider = openai,
         hl_group = 'SpecialComment',
@@ -455,7 +457,7 @@ local openai = require('llm.providers.openai')
 
 require('llm').setup({
   prompts = {
-    ['show parts'] = {
+    ['show_parts'] = {
       provider = openai,
       builder = openai.default_builder,
       mode = {
@@ -551,7 +553,7 @@ return {
       }
     end,
   },
-  ['to spanish'] = {
+  ['to_spanish'] = {
     provider = openai,
     hl_group = 'SpecialComment',
     builder = function(input)
@@ -570,7 +572,7 @@ return {
     end,
     mode = segment.mode.REPLACE
   },
-  ['to javascript'] = {
+  ['to_javascript'] = {
     provider = openai,
     builder = function(input, ctx)
       return {
@@ -587,7 +589,7 @@ return {
       }
     end,
   },
-  ['to rap'] = {
+  ['to_rap'] = {
     provider = openai,
     hl_group = 'Title',
     builder = function(input)
