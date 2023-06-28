@@ -1,5 +1,5 @@
-local segment = require('llm.segment')
-local util = require('llm.util')
+local segment = require("llm.segment")
+local util = require("llm.util")
 
 local M = {}
 
@@ -25,7 +25,7 @@ M.mode = {
   REPLACE = "replace",
   BUFFER = "buffer",
   INSERT = "insert",
-  INSERT_OR_REPLACE = "insert_or_replace"
+  INSERT_OR_REPLACE = "insert_or_replace",
 }
 
 ---@class StreamHandlers
@@ -38,12 +38,7 @@ local function get_segment(input, segment_mode, hl_group)
     if input.selection ~= nil then
       -- clear selection
       util.buf.set_text(input.selection, {})
-      local seg = segment.create_segment_at(
-        input.selection.start.row,
-        input.selection.start.col,
-        hl_group,
-        0
-      )
+      local seg = segment.create_segment_at(input.selection.start.row, input.selection.start.col, hl_group, 0)
 
       seg.data.original = input.lines
 
@@ -60,18 +55,13 @@ local function get_segment(input, segment_mode, hl_group)
     end
   elseif segment_mode == M.mode.APPEND then
     if input.selection ~= nil then
-      return segment.create_segment_at(
-        input.selection.stop.row,
-        input.selection.stop.col,
-        hl_group,
-        0
-      )
+      return segment.create_segment_at(input.selection.stop.row, input.selection.stop.col, hl_group, 0)
     else
       return segment.create_segment_at(#input.lines, 0, hl_group, 0)
     end
   elseif segment_mode == M.mode.BUFFER then
     -- Find or create a scratch buffer for this plugin
-    local bufname = '__llm__'
+    local bufname = "__llm__"
     local llm_bfnr = vim.fn.bufnr(bufname, true)
 
     if llm_bfnr == -1 then
@@ -79,11 +69,11 @@ local function get_segment(input, segment_mode, hl_group)
       vim.api.nvim_buf_set_name(llm_bfnr, bufname)
     end
 
-    vim.api.nvim_buf_set_option(llm_bfnr, 'buflisted', true)
-    vim.api.nvim_buf_set_option(llm_bfnr, 'buftype', 'nowrite')
+    vim.api.nvim_buf_set_option(llm_bfnr, "buflisted", true)
+    vim.api.nvim_buf_set_option(llm_bfnr, "buftype", "nowrite")
 
     vim.api.nvim_buf_set_lines(llm_bfnr, -2, -1, false, input.lines)
-    vim.api.nvim_buf_set_lines(llm_bfnr, -1, -1, false, {'',''})
+    vim.api.nvim_buf_set_lines(llm_bfnr, -1, -1, false, { "", "" })
 
     -- Open the existing buffer or create a new one
     vim.api.nvim_set_current_buf(llm_bfnr)
@@ -96,7 +86,7 @@ local function get_segment(input, segment_mode, hl_group)
 
     return segment.create_segment_at(pos.row, pos.col, hl_group, 0)
   else
-    error('Unknown segment mode: ' .. segment_mode)
+    error("Unknown segment mode: " .. segment_mode)
   end
 end
 
@@ -108,12 +98,12 @@ local function get_input(want_visual_selection)
     return {
       selection = selection,
       position = util.cursor.position(),
-      lines = lines
+      lines = lines,
     }
   else
     return {
       position = util.cursor.position(),
-      lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+      lines = vim.api.nvim_buf_get_lines(0, 0, -1, false),
     }
   end
 end
@@ -123,17 +113,17 @@ local function get_before_after(input)
     before = util.buf.text({
       start = {
         row = 0,
-        col = 0
+        col = 0,
       },
-      stop = input.selection ~= nil and input.selection.start or input.position
+      stop = input.selection ~= nil and input.selection.start or input.position,
     }),
     after = util.buf.text({
       start = input.selection ~= nil and input.selection.stop or input.position,
       stop = {
         row = -1,
-        col = -1
+        col = -1,
       },
-    })
+    }),
   }
 end
 
@@ -181,7 +171,7 @@ local function build_request_handle_params(segment_mode, want_visual_selection, 
       before = before_after.before,
       after = before_after.after,
       args = args,
-    }
+    },
   }
 end
 
@@ -194,26 +184,22 @@ local function start_prompt(input, prompt, handlers, context)
   -- TODO args to prompts is probably less useful than the prompt buffer / helper
 
   local function as_string(str_or_strs)
-    if type(input) == 'string' then
+    if type(input) == "string" then
       return str_or_strs
     else
-      return table.concat(str_or_strs, '\n')
+      return table.concat(str_or_strs, "\n")
     end
   end
 
-  local prompt_built = assert(prompt.builder(as_string(input), context), 'prompt builder produced nil')
+  local prompt_built = assert(prompt.builder(as_string(input), context), "prompt builder produced nil")
 
   local function do_request(built_params)
-    local params = vim.tbl_extend(
-      'force',
-      (prompt.params or {}),
-      built_params
-    )
+    local params = vim.tbl_extend("force", (prompt.params or {}), built_params)
 
     return prompt.provider.request_completion(handlers, params, prompt.options)
   end
 
-  if type(prompt_built) == 'function' then
+  if type(prompt_built) == "function" then
     local cancel
 
     prompt_built(function(prompt_params)
@@ -246,22 +232,21 @@ local function request_completion_input_segment(handle_params, prompt)
 
       if reason == nil or reason == 'stop' then
         seg.clear_hl()
-      elseif reason == 'length' then
-        seg.highlight('Error')
-        util.eshow('Hit token limit')
+      elseif reason == "length" then
+        seg.highlight("Error")
+        util.eshow("Hit token limit")
       else
-        seg.highlight('Error')
-        util.eshow('Response ended because: ' .. reason)
+        seg.highlight("Error")
+        util.eshow("Response ended because: " .. reason)
       end
 
       if prompt.mode == M.mode.BUFFER then
-        seg.highlight('Identifier')
+        seg.highlight("Identifier")
       end
     end,
-
     on_error = function(data, label)
-      util.eshow(data, 'stream error ' .. (label or ''))
-    end
+      util.eshow(data, "stream error " .. (label or ""))
+    end,
   }, handle_params.context)
 
   seg.data.cancel = cancel
@@ -288,7 +273,7 @@ end
 function M.request_completion(prompt, args, want_visual_selection, default_hl_group)
   local prompt_mode = prompt.mode or M.mode.APPEND
 
-  if type(prompt_mode) == 'table' then -- prompt_mode is StreamHandlers
+  if type(prompt_mode) == "table" then -- prompt_mode is StreamHandlers
     -- TODO probably want to just remove streamhandlers prompt mode
     local stream_handlers = prompt_mode
 
@@ -296,26 +281,17 @@ function M.request_completion(prompt, args, want_visual_selection, default_hl_gr
       M.mode.APPEND, -- we don't use the segment here, append will create an empty segment at end of selection
       want_visual_selection,
       prompt.hl_group or default_hl_group,
-      ''
+      ""
     )
 
-    start_prompt(
-      handle_params.input,
-      prompt,
-      stream_handlers,
-      handle_params.context
-    )
+    start_prompt(handle_params.input, prompt, stream_handlers, handle_params.context)
 
     return
   end
 
   ---@cast prompt_mode SegmentMode
-  local handle_params = build_request_handle_params(
-    prompt_mode,
-    want_visual_selection,
-    prompt.hl_group or default_hl_group,
-    args
-  )
+  local handle_params =
+      build_request_handle_params(prompt_mode, want_visual_selection, prompt.hl_group or default_hl_group, args)
 
   request_completion_input_segment(handle_params, prompt)
 end
@@ -326,7 +302,7 @@ function M.request_multi_completion_streams(prompts, want_visual_selection, defa
       M.mode.APPEND, -- multi-mode always append only
       want_visual_selection,
       prompt.hl_group or default_hl_group,
-      ''
+      ""
     )
 
     -- try to avoid ratelimits

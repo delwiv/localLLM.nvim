@@ -80,7 +80,7 @@ https://user-images.githubusercontent.com/6422188/233774216-4e100122-3a93-4dfb-a
 
 <details>
 <summary>
-🚧 WIP - Local vector store 
+🚧 WIP - Local vector store
 </summary>
 
 ### Requirements
